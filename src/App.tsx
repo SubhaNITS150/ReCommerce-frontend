@@ -16,6 +16,9 @@ import Register from "./pages/Register";
 import InitiateReturn from "@/pages/InitiateReturn";
 import GreenCredits from "@/pages/GreenCredits";
 import Cart from "@/pages/Cart";
+import MyOrders from "@/pages/MyOrders";
+import UserHome from "@/pages/UserHome";
+import MyReturns from "@/pages/MyReturns";
 const queryClient = new QueryClient();
 
 function Router() {
@@ -31,6 +34,9 @@ function Router() {
       <Route path="/initiate-return" component={InitiateReturn} />
       <Route path="/green-credits" component={GreenCredits} />
       <Route path="/cart" component={Cart} />
+      <Route path="/my-orders" component={MyOrders} />
+      <Route path="/home" component={UserHome} />
+      <Route path="/my-returns" component={MyReturns} />
       <Route component={NotFound} />
     </Switch>
   );
