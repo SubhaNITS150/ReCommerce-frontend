@@ -6,8 +6,9 @@ import { UploadCloud, CheckCircle2, AlertTriangle, ArrowRight, Zap, RefreshCcw, 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-
+import { useLocation } from "wouter";
 export default function SellerDashboard() {
+  const [, setLocation] = useLocation();
   const [isUploading, setIsUploading] = useState(false);
   const [assessmentResult, setAssessmentResult] = useState<null | any>(null);
   const [redeemed, setRedeemed] = useState<string | null>(null);
@@ -57,7 +58,8 @@ export default function SellerDashboard() {
           <h1 className="text-2xl font-bold text-gray-900">Seller & Return Dashboard</h1>
           <p className="text-sm text-gray-600">Manage your returns, track AI assessments, and view logistics routing.</p>
         </div>
-        <Button className="bg-primary hover:bg-accent text-black font-bold border border-primary-border shadow-sm" data-testid="button-initiate-return">
+        <Button onClick={() => setLocation("/initiate-return")}
+        className="bg-primary hover:bg-accent text-black font-bold border border-primary-border shadow-sm" data-testid="button-initiate-return">
           Initiate Return
         </Button>
       </div>

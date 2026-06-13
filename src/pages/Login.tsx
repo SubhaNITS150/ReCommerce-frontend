@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+// Assuming your supabaseClient is in the lib folder as discussed previously
+import { supabase } from '../lib/supabaseClient';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -7,7 +9,27 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
-    // Implement later
+    e.preventDefault(); // Prevent default form submission/page reload
+    setLoading(true);
+    setError(null); // Clear any previous errors
+
+    // 1. Authenticate with Supabase
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    // 2. Handle errors (e.g., wrong password, user doesn't exist)
+    if (signInError) {
+      setError(signInError.message);
+      setLoading(false);
+      return;
+    }
+
+    // 3. On success, redirect to your dashboard/home page
+    // Using standard window.location for a hard redirect. 
+    // (If you are using react-router-dom, you could also use the useNavigate hook here)
+    window.location.href = 'http://localhost:5173/';
   };
 
   return (
@@ -77,4 +99,4 @@ export default function Login() {
       </div>
     </div>
   );
-}   //LOGIN.TSX
+}

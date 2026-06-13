@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, ChevronDown, MapPin, Search, Star, Lock, TrendingDown, Sparkles, ChevronRight } from "lucide-react";
+import { toast } from "sonner"; // Imported toast to alert the user when items go into the cart
 
 const predictiveInsights: Record<string, { risk: "low" | "medium" | "high"; returnRate: number; insight: string; refurbishedAlternative?: string; alternativePrice?: number }> = {
   "6":  { risk: "high",   returnRate: 47, insight: "Size 6 has a 47% return rate for this model — runners report it runs 1.5 sizes large.", refurbishedAlternative: "Nike Air Max 270 (Size 7) – Certified Refurbished", alternativePrice: 7200 },
@@ -14,8 +15,41 @@ const predictiveInsights: Record<string, { risk: "low" | "medium" | "high"; retu
 
 export default function BuyNew() {
   const [selectedSize, setSelectedSize] = useState<string>("9");
+  const [quantity, setQuantity] = useState<number>(1);
   
   const sizes = ["6", "7", "8", "9", "10", "11", "12"];
+
+  // Custom addition function logic updating shared application store array via localStorage
+  const handleAddToCart = (overrideProduct?: { name: string; price: number; condition: string }) => {
+    try {
+      const existingCart = JSON.parse(localStorage.getItem("recommerce_cart") || "[]");
+      const activeInsight = predictiveInsights[selectedSize];
+
+      // Format custom object variables to feed the global Cart state list seamlessly
+      const cartItem = {
+        id: `new-${selectedSize}-${Date.now()}`,
+        title: overrideProduct?.name || "Nike Men's Air Max 2024 Running Shoe",
+        condition: overrideProduct?.condition || `Brand New (UK Size ${selectedSize} - ${activeInsight?.risk || "low"} return risk)`,
+        price: overrideProduct?.price || 14995,
+        originalPrice: overrideProduct ? 14995 : 14995,
+        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=150&q=80", // fallback decorative premium item thumbnail
+        co2Saved: overrideProduct ? "12.4 kg" : "0.0 kg (New Item Option)",
+        greenCreditsEarned: overrideProduct ? 45 : 15,
+        quantity: quantity
+      };
+
+      const updatedCart = [...existingCart, cartItem];
+      localStorage.setItem("recommerce_cart", JSON.stringify(updatedCart));
+
+      // Dispatches storage update for immediate layout header re-renders
+      window.dispatchEvent(new Event("storage"));
+      
+      toast.success(`Successfully added ${quantity}x item(s) to your Eco-Cart!`);
+    } catch (e) {
+      console.error("Cart generation parsing crashed.", e);
+      toast.error("Failed to add to cart.");
+    }
+  };
 
   return (
     <div className="max-w-[1500px] mx-auto bg-white p-4 pb-20">
@@ -146,10 +180,14 @@ export default function BuyNew() {
             <p className="text-xl text-green-700 font-medium mb-4">In stock</p>
 
             <div className="mb-4">
-              <select className="bg-gray-100 border border-gray-300 text-sm rounded px-2 py-1.5 shadow-sm outline-none w-16 focus:ring-1 focus:ring-primary focus:border-primary">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
+              <select 
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value))}
+                className="bg-gray-100 border border-gray-300 text-sm rounded px-2 py-1.5 shadow-sm outline-none w-16 focus:ring-1 focus:ring-primary focus:border-primary"
+              >
+                <option value={1}>1</option>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
               </select>
             </div>
 
@@ -188,7 +226,7 @@ export default function BuyNew() {
                       </div>
                       <p className={`text-xs mt-1 leading-snug ${isHigh ? "text-red-800" : "text-amber-800"}`}>{insight.insight}</p>
                       {insight.refurbishedAlternative && (
-                        <div className="mt-2 bg-white border border-gray-200 rounded p-2 flex items-center justify-between gap-2">
+                        <div className="mt-2 bg-white border border-gray-200 rounded p-2 flex items-center justify-between gap-2 text-left">
                           <div>
                             <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wide flex items-center gap-1">
                               <TrendingDown className="h-3 w-3 text-green-600" /> AI Recommends Refurbished Alternative
@@ -196,7 +234,17 @@ export default function BuyNew() {
                             <p className="text-xs font-medium text-gray-800 mt-0.5">{insight.refurbishedAlternative}</p>
                             <p className="text-xs font-black text-primary">₹{insight.alternativePrice?.toLocaleString()} <span className="text-gray-400 font-normal line-through">₹14,995</span></p>
                           </div>
-                          <button className="shrink-0 flex items-center gap-0.5 text-xs font-bold text-blue-700 hover:underline" data-testid="button-view-alternative">
+                          <button 
+                            className="shrink-0 flex items-center gap-0.5 text-xs font-bold text-blue-700 hover:underline" 
+                            data-testid="button-view-alternative"
+                            onClick={() => {
+                              handleAddToCart({
+                                name: insight.refurbishedAlternative || "Alternative Nike Air Max",
+                                price: insight.alternativePrice || 7000,
+                                condition: "Refurbished / Open Box (Eco Alternative Match)"
+                              });
+                            }}
+                          >
                             View <ChevronRight className="h-3 w-3" />
                           </button>
                         </div>
@@ -217,10 +265,16 @@ export default function BuyNew() {
             })()}
 
             <div className="space-y-2 mb-4">
-              <Button className="w-full bg-primary hover:bg-accent text-black font-normal rounded-full border border-primary-border shadow-sm">
+              <Button 
+                className="w-full bg-primary hover:bg-accent text-black font-normal rounded-full border border-primary-border shadow-sm"
+                onClick={() => handleAddToCart()}
+              >
                 Add to Cart
               </Button>
-              <Button className="w-full bg-accent hover:bg-orange-400 text-black font-normal rounded-full border border-accent-border shadow-sm">
+              <Button 
+                className="w-full bg-accent hover:bg-orange-400 text-black font-normal rounded-full border border-accent-border shadow-sm"
+                onClick={() => handleAddToCart()}
+              >
                 Buy Now
               </Button>
             </div>

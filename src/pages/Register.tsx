@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+// IMPORTANT: Adjust this import path to point to where you initialized your Supabase client
+import { supabase } from '../lib/supabaseClient';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -9,7 +11,35 @@ export default function Register() {
   const [success, setSuccess] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
-    // Implement later
+    e.preventDefault(); // Prevent the page from reloading
+    setLoading(true);
+    setError(null);
+
+    // 1. Call Supabase to create the user
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        // 2. Store the extra "fullName" field in the user's metadata
+        data: {
+          full_name: fullName,
+        },
+      },
+    });
+
+    // 3. Handle any errors from Supabase
+    if (signUpError) {
+      setError(signUpError.message);
+      setLoading(false);
+      return;
+    }
+
+    // 4. If successful, show the success screen
+    if (data.user) {
+      setSuccess(true);
+    }
+    
+    setLoading(false);
   };
 
   if (success) {
@@ -108,4 +138,4 @@ export default function Register() {
       </div>
     </div>
   );
-}//register.tsx
+}
