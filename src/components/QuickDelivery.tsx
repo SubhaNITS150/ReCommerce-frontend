@@ -112,9 +112,6 @@ export function QuickDelivery() {
                     <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded border border-blue-200 flex items-center gap-1">
                       <Clock className="h-3 w-3" /> {deal.estimated_delivery_days}
                     </span>
-                    <span className="text-[10px] font-bold text-gray-500">
-                      {deal.distance_km.toFixed(1)} km away
-                    </span>
                   </div>
                   <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1">
                     {deal.specs}

@@ -374,7 +374,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner"; // Imported toast to alert the user
-import { QuickDelivery } from "@/components/QuickDelivery";
 
 export default function Marketplace() {
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
@@ -490,8 +489,6 @@ export default function Marketplace() {
 
       {/* Main Content */}
       <main className="flex-1 min-w-0">
-
-        <QuickDelivery />
 
         {/* Personalized Recommendations Banner */}
         <div className="mb-6 bg-gradient-to-r from-[#131921] to-[#232f3e] rounded-lg p-4 text-white" data-testid="section-recommendations">
