@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Leaf, ShoppingCart, Sparkles, Award, ArrowRight, ShieldCheck, Heart, Percent } from "lucide-react";
 import { marketplaceProducts, personalizedRecommendations } from "@/data/mockData";
 import { toast } from "sonner";
+import { QuickDelivery } from "@/components/QuickDelivery";
 
 export default function UserHome() {
   const [, setLocation] = useLocation();
@@ -141,6 +142,8 @@ export default function UserHome() {
         </div>
 
       </div>
+
+      <QuickDelivery />
 
       {/* 3. AI RECOMMENDED HORIZONTAL CONTAINER STRIP */}
       <div className="max-w-[1500px] mx-auto px-4 mt-6">
