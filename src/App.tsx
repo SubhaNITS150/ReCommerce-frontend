@@ -19,6 +19,8 @@ import Cart from "@/pages/Cart";
 import MyOrders from "@/pages/MyOrders";
 import UserHome from "@/pages/UserHome";
 import MyReturns from "@/pages/MyReturns";
+import InitiateResell from "@/pages/InitiateResell";
+import AIAssessmentResults from "@/pages/AIAssessmentResults";
 const queryClient = new QueryClient();
 
 function Router() {
@@ -37,6 +39,8 @@ function Router() {
       <Route path="/my-orders" component={MyOrders} />
       <Route path="/home" component={UserHome} />
       <Route path="/my-returns" component={MyReturns} />
+      <Route path="/initiate-resell" component={InitiateResell} />
+      <Route path="/ai-results" component={AIAssessmentResults} />
       <Route component={NotFound} />
     </Switch>
   );

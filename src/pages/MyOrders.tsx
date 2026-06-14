@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Package, Clock, ShieldCheck, ArrowUpRight, HelpCircle, Leaf } from "lucide-react";
+import { ArrowLeft, Package, Clock, ShieldCheck, HelpCircle, Leaf } from "lucide-react";
 import { toast } from "sonner";
 
 // Mock data reflecting standard orders vs highly sustainable items
@@ -74,20 +74,6 @@ export default function MyOrders() {
   const [, setLocation] = useLocation();
   const [orders] = useState(INITIAL_ORDERS);
 
-  // Handles logic for adding Green Credits upon successful processing transactions
-  const claimActionCredits = (credits: number, orderId: string) => {
-    if (credits === 0) {
-      toast.info("Standard item tracking data updated.");
-      return;
-    }
-
-    // 1. Alert the user they unlocked green credits via their circular purchase loop
-    toast.success(`Eco-Action Verified! +${credits} Green Credits added to your account for Order #${orderId}`);
-    
-    // 2. Fire a mock storage trigger event to signal your header components to dynamically update credit meters
-    window.dispatchEvent(new Event("storage"));
-  };
-
   return (
     <div className="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8 font-sans text-gray-900">
       <div className="max-w-4xl mx-auto">
@@ -95,7 +81,7 @@ export default function MyOrders() {
         {/* Back Link */}
         <button 
           onClick={() => setLocation("/")}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-amber-600 transition-colors mb-6 cursor-pointer group"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-amber-600 transition-colors mb-6 cursor-pointer group border-0 bg-transparent"
         >
           <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
           Back to Dashboard
@@ -186,12 +172,13 @@ export default function MyOrders() {
 
                     {/* Right Contextual Action Columns */}
                     <div className="w-full sm:w-auto flex flex-col gap-2 shrink-0 pt-2 sm:pt-0">
+                      {/* FIXED: Changed to direct wouter router pushing to /initiate-resell */}
                       <button 
                         type="button"
-                        onClick={() => claimActionCredits(item.greenCreditsOnAction, order.id)}
+                        onClick={() => setLocation("/initiate-resell")}
                         className="w-full sm:w-48 bg-amber-500 hover:bg-amber-600 text-gray-950 font-medium py-1.5 px-3 rounded text-xs transition-colors border border-amber-600/20 shadow-sm cursor-pointer text-center"
                       >
-                        Track Package
+                        Initiate Resell
                       </button>
                       
                       {item.canReturn ? (
