@@ -1,114 +1,12 @@
-// import React, { useState } from 'react';
-// // Assuming your supabaseClient is in the lib folder as discussed previously
-// import { supabase } from '../lib/supabaseClient';
-
-// export default function Login() {
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState<string | null>(null);
-
-//   const handleLogin = async (e: React.FormEvent) => {
-//     e.preventDefault(); // Prevent default form submission/page reload
-//     setLoading(true);
-//     setError(null); // Clear any previous errors
-
-//     // 1. Authenticate with Supabase
-//     const { error: signInError } = await supabase.auth.signInWithPassword({
-//       email,
-//       password,
-//     });
-
-//     // 2. Handle errors (e.g., wrong password, user doesn't exist)
-//     if (signInError) {
-//       setError(signInError.message);
-//       setLoading(false);
-//       return;
-//     }
-
-//     // 3. On success, redirect to your dashboard/home page
-//     // Using standard window.location for a hard redirect. 
-//     // (If you are using react-router-dom, you could also use the useNavigate hook here)
-//     window.location.href = 'http://localhost:5173/';
-//   };
-
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-//       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-//         <div>
-//           <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900 flex items-center justify-center gap-2">
-//             <span className="text-orange-500">⚡</span> ReCommerce
-//           </h2>
-//           <p className="mt-2 text-center text-sm text-gray-600">
-//             Sign in to your Seller & Return account
-//           </p>
-//         </div>
-//         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-//           {error && (
-//             <div className="bg-red-50 text-red-500 p-3 rounded text-sm text-center">
-//               {error}
-//             </div>
-//           )}
-//           <div className="rounded-md shadow-sm space-y-4">
-//             <div>
-//               <label htmlFor="email-address" className="sr-only">Email address</label>
-//               <input
-//                 id="email-address"
-//                 name="email"
-//                 type="email"
-//                 autoComplete="email"
-//                 required
-//                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-//                 placeholder="Email address"
-//                 value={email}
-//                 onChange={(e) => setEmail(e.target.value)}
-//               />
-//             </div>
-//             <div>
-//               <label htmlFor="password" className="sr-only">Password</label>
-//               <input
-//                 id="password"
-//                 name="password"
-//                 type="password"
-//                 autoComplete="current-password"
-//                 required
-//                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-//                 placeholder="Password"
-//                 value={password}
-//                 onChange={(e) => setPassword(e.target.value)}
-//               />
-//             </div>
-//           </div>
-
-//           <div>
-//             <button
-//               type="submit"
-//               disabled={loading}
-//               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 transition-colors"
-//             >
-//               {loading ? 'Signing in...' : 'Sign in'}
-//             </button>
-//           </div>
-//         </form>
-//         <div className="text-center text-sm">
-//           <span className="text-gray-600">Don't have an account? </span>
-//           <a href="/register" className="font-medium text-orange-500 hover:text-orange-400">
-//             Register here
-//           </a>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-import React, { useState } from 'react';
-import { useLocation } from 'wouter';
-import { supabase } from '../lib/supabaseClient';
+import React, { useState } from "react";
+import { useLocation } from "wouter";
+import { supabase } from "../lib/supabaseClient";
+import api from "../lib/axios";
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -118,22 +16,29 @@ export default function Login() {
     setLoading(true);
     setError(null);
 
-    // 1. Authenticate with Supabase
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const response = await api.post(
+        `/auth/login`,
+        {
+          email,
+          password,
+        },
+      );
 
-    // 2. Handle authentication errors
-    if (signInError) {
-      setError(signInError.message);
+      const { user, tokens } = response.data;
+
+      localStorage.setItem("accessToken", tokens.access.token);
+      localStorage.setItem("refreshToken", tokens.refresh.token);
+      localStorage.setItem("userData", JSON.stringify(user));
+
       setLoading(false);
-      return;
+      setLocation("/");
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message || "An error occurred during verification.";
+      setError(errorMessage);
+      setLoading(false);
     }
-
-    // 3. On success, redirect to dashboard using dynamic local router location change
-    setLoading(false);
-    setLocation("/");
   };
 
   // Google OAuth Login Handler
@@ -143,7 +48,7 @@ export default function Login() {
       setError(null);
 
       const { error: googleError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           // Dynamic origin prevents broken redirects when you change ports or deploy
           redirectTo: window.location.origin,
@@ -152,7 +57,9 @@ export default function Login() {
 
       if (googleError) throw googleError;
     } catch (err: any) {
-      setError(err.message || 'An error occurred during Google authentication.');
+      setError(
+        err.message || "An error occurred during Google authentication.",
+      );
       setLoading(false);
     }
   };
@@ -184,7 +91,12 @@ export default function Login() {
               onClick={handleGoogleLogin}
               className="w-full flex items-center justify-center gap-3 py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 transition-colors cursor-pointer"
             >
-              <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" width="100%" height="100%">
+              <svg
+                className="h-5 w-5 shrink-0"
+                viewBox="0 0 24 24"
+                width="100%"
+                height="100%"
+              >
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   fill="#4285F4"
@@ -218,7 +130,9 @@ export default function Login() {
           <form className="space-y-6" onSubmit={handleLogin}>
             <div className="rounded-md shadow-sm space-y-4">
               <div>
-                <label htmlFor="email-address" className="sr-only">Email address</label>
+                <label htmlFor="email-address" className="sr-only">
+                  Email address
+                </label>
                 <input
                   id="email-address"
                   name="email"
@@ -232,7 +146,9 @@ export default function Login() {
                 />
               </div>
               <div>
-                <label htmlFor="password" className="sr-only">Password</label>
+                <label htmlFor="password" className="sr-only">
+                  Password
+                </label>
                 <input
                   id="password"
                   name="password"
@@ -253,7 +169,7 @@ export default function Login() {
                 disabled={loading}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 transition-colors cursor-pointer"
               >
-                {loading ? 'Signing in...' : 'Sign in'}
+                {loading ? "Signing in..." : "Sign in"}
               </button>
             </div>
           </form>
@@ -261,7 +177,10 @@ export default function Login() {
 
         <div className="text-center text-sm">
           <span className="text-gray-600">Don't have an account? </span>
-          <a href="/register" className="font-medium text-orange-500 hover:text-orange-400">
+          <a
+            href="/register"
+            className="font-medium text-orange-500 hover:text-orange-400"
+          >
             Register here
           </a>
         </div>
