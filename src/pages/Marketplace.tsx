@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import api from "../lib/axios";
 
-// TypeScript interface representing the dynamic live marketplace data format
+// TypeScript interface representing the dynamic live marketplace database schema
 interface DBListing {
   id: string;
   itemId: string;
@@ -25,7 +25,7 @@ interface DBListing {
   listingPrice: string;
   status: string;
   createdAt: string;
-  proximity?: string; // Appended by our proximity service algorithm
+  proximity?: string; // Appended by backend proximity logic service
   item?: {
     name: string;
     brand: string | null;
@@ -69,12 +69,14 @@ export default function Marketplace() {
       const newCartItem = {
         id: `cart-${product.id || product.id}-${Date.now()}`,
         title: product.name || product.title,
-        condition: isRecommendation ? `Recommended - ${product.reason}` : `${product.condition || "Verified Operational"}`,
-        price: parseFloat(product.price || product.listingPrice),
-        originalPrice: product.originalPrice || parseFloat(product.listingPrice) * 1.2,
+        condition: isRecommendation 
+          ? `Recommended - ${product.reason}` 
+          : `${product.condition || "Verified Operational"}`,
+        price: parseFloat(product.price || product.listingPrice || "0"),
+        originalPrice: product.originalPrice || parseFloat(product.price || product.listingPrice || "0") * 1.2,
         image: product.image || product.item?.images?.[0]?.imageUrl || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=150&q=80",
         co2Saved: "11.2 kg",
-        greenCreditsEarned: Math.round(parseFloat(product.price || product.listingPrice) * 0.005),
+        greenCreditsEarned: Math.round(parseFloat(product.price || product.listingPrice || "0") * 0.005),
         quantity: 1
       };
 
@@ -131,22 +133,6 @@ export default function Marketplace() {
             </div>
           </div>
         </div>
-
-        <div className="border-t border-gray-200 pt-4">
-          <h3 className="font-bold text-sm mb-3">Price</h3>
-          <ul className="space-y-1.5 text-sm text-gray-700 mb-3">
-            <li className="hover:text-primary cursor-pointer">Under ₹1,000</li>
-            <li className="hover:text-primary cursor-pointer">₹1,000 - ₹5,000</li>
-            <li className="hover:text-primary cursor-pointer">₹5,000 - ₹20,000</li>
-            <li className="hover:text-primary cursor-pointer">Over ₹20,000</li>
-          </ul>
-          <div className="flex gap-2 items-center">
-            <Input placeholder="Min" className="h-8 text-sm" />
-            <span className="text-gray-400">-</span>
-            <Input placeholder="Max" className="h-8 text-sm" />
-            <Button size="sm" variant="outline" className="h-8">Go</Button>
-          </div>
-        </div>
       </aside>
 
       {/* Main Content */}
@@ -172,7 +158,13 @@ export default function Marketplace() {
                   key={rec.id}
                   className="shrink-0 w-44 bg-white rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all group"
                   data-testid={`card-rec-${rec.id}`}
-                  onClick={() => setSelectedProduct({ ...rec, condition: "Like New", history: "Returned within 48h", warranty: "6 Months ReCommerce Standard Warranty" })}
+                  onClick={() => setSelectedProduct({ 
+                    ...rec, 
+                    condition: "Like New", 
+                    score: rec.score || 9.2,
+                    history: "Returned within 48h", 
+                    warranty: "6 Months ReCommerce Standard Warranty" 
+                  })}
                 >
                   <div className="aspect-square bg-gray-100 flex items-center justify-center relative">
                     <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center">
@@ -239,23 +231,24 @@ export default function Marketplace() {
                       id: listing.id,
                       name: listing.title,
                       price: parseFloat(listing.listingPrice),
-                      originalPrice: parseFloat(listing.listingPrice) * 1.2,
+                      originalPrice: parseFloat(listing.listingPrice) * 1.25,
                       condition: "Verified Resale",
-                      score: 8.5,
-                      history: "Inspected at Silchar logistics center",
-                      warranty: "Local Peer Protection Guarantee"
+                      score: 8.8,
+                      image: itemImg,
+                      history: "Inspected live at the local Silchar evaluation center.",
+                      warranty: "100-Day P2P Local Protection Guarantee Enabled"
                     })}
                   >
                     <div>
                       <div className="aspect-square bg-gray-50 flex items-center justify-center relative p-2">
                         <img src={itemImg} alt={listing.title} className="max-h-full max-w-full object-contain rounded" />
-                        <div className="absolute top-1.5 left-1.5 bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                          <MapPin className="h-2 w-2" /> {listing.proximity || "Local"}
+                        <div className="absolute top-1.5 left-1.5 bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-sm">
+                          <MapPin className="h-2 w-2" /> {listing.proximity || "Local hub"}
                         </div>
                       </div>
                       <div className="p-2">
                         <h4 className="text-gray-900 text-[11px] font-bold line-clamp-1 leading-tight mb-0.5">{listing.title}</h4>
-                        <p className="text-[10px] text-gray-500 line-clamp-1 mb-1">{listing.description}</p>
+                        <p className="text-[10px] text-gray-500 line-clamp-1 mb-1">{listing.description || "No added notes provided by owner."}</p>
                         <span className="text-xs font-black text-gray-950">₹{parseFloat(listing.listingPrice).toLocaleString("en-IN")}</span>
                       </div>
                     </div>
@@ -364,10 +357,15 @@ export default function Marketplace() {
         <DialogContent className="max-w-2xl p-0 overflow-hidden" data-testid="modal-product-health">
           {selectedProduct && (
             <div className="flex flex-col md:flex-row h-full">
+              
               {/* Left col - Image */}
               <div className="bg-gray-100 p-6 flex flex-col items-center justify-center md:w-2/5 border-r border-gray-200">
-                <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center mb-4 shadow-inner">
-                  <Search className="h-10 w-10 text-gray-400" />
+                <div className="w-32 h-32 bg-gray-200 border border-gray-300 rounded-full flex items-center justify-center mb-4 shadow-inner overflow-hidden">
+                  {selectedProduct.image ? (
+                    <img src={selectedProduct.image} alt="Target Selection" className="h-full w-full object-cover" />
+                  ) : (
+                    <Search className="h-10 w-10 text-gray-400" />
+                  )}
                 </div>
                 <div className="text-center w-full">
                   <div className="text-3xl font-black text-gray-900 mb-1">{selectedProduct.score}<span className="text-lg text-gray-500 font-normal">/10</span></div>
@@ -398,10 +396,10 @@ export default function Marketplace() {
               {/* Right col - Details */}
               <div className="p-6 md:w-3/5 flex flex-col">
                 <div className="mb-4">
-                  <h2 className="text-xl font-bold text-gray-900 leading-tight mb-2">{selectedProduct.name}</h2>
+                  <h2 className="text-xl font-bold text-gray-900 leading-tight mb-2">{selectedProduct.name || selectedProduct.title}</h2>
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline" className={getConditionColor(selectedProduct.condition || "Like New")}>
-                      Condition: {selectedProduct.condition || "Like New"}
+                    <Badge variant="outline" className={getConditionColor(selectedProduct.condition || "Verified Resale")}>
+                      Condition: {selectedProduct.condition || "Verified Resale"}
                     </Badge>
                     <span className="text-sm text-primary font-bold">
                       Save {Math.round(((selectedProduct.originalPrice - selectedProduct.price) / selectedProduct.originalPrice) * 100)}%
@@ -421,7 +419,7 @@ export default function Marketplace() {
                     <ul className="text-xs text-gray-700 space-y-1">
                       <li className="flex items-start gap-1.5"><Check className="h-3 w-3 text-green-500 shrink-0 mt-0.5" /> 100% Authentic verified by computer vision</li>
                       <li className="flex items-start gap-1.5"><Check className="h-3 w-3 text-green-500 shrink-0 mt-0.5" /> Fully functional, stress-tested</li>
-                      <li className="flex items-start gap-1.5"><Check className="h-3 w-3 text-green-500 shrink-0 mt-0.5" /> Minor cosmetic wear on back panel</li>
+                      <li className="flex items-start gap-1.5"><Check className="h-3 w-3 text-green-500 shrink-0 mt-0.5" /> Checked parameters align with regional hub standards</li>
                     </ul>
                   </div>
 

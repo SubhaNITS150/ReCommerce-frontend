@@ -1,11 +1,10 @@
-
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster as SonnerToaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import { AmazonHeader } from "@/components/AmazonHeader";
-import { ToastScheduler } from "@/components/ToastScheduler";
+// import { ToastScheduler } from "@/components/ToastScheduler";
 import SellerDashboard from "@/pages/SellerDashboard";
 import LogisticsTriage from "@/pages/LogisticsTriage";
 import Marketplace from "@/pages/Marketplace";
@@ -78,7 +77,7 @@ function App() {
           <AppContent />
         </WouterRouter>
         <SonnerToaster position="bottom-right" />
-        <ToastScheduler />
+        {/* <ToastScheduler /> */}
       </TooltipProvider>
     </QueryClientProvider>
   );

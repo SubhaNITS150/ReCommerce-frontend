@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, Link } from "wouter";
+import { useLocation } from "wouter";
 import { ArrowLeft, RefreshCw, Leaf, ShieldCheck, AlertCircle, HelpCircle, FileText } from "lucide-react";
 import { toast } from "sonner";
 
@@ -57,7 +57,7 @@ const INITIAL_RETURNS = [
 
 export default function MyReturns() {
   const [, setLocation] = useLocation();
-  const [returnsList, setReturnsList] = useState(INITIAL_RETURNS);
+  const [returnsList] = useState(INITIAL_RETURNS);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = () => {
