@@ -24,7 +24,7 @@ const queryClient = new QueryClient();
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={SellerDashboard} />
+      <Route path="/" component={UserHome} />
       <Route path="/logistics" component={LogisticsTriage} />
       <Route path="/marketplace" component={Marketplace} />
       <Route path="/buy-new" component={BuyNew} />
@@ -35,7 +35,7 @@ function Router() {
       <Route path="/green-credits" component={GreenCredits} />
       <Route path="/cart" component={Cart} />
       <Route path="/my-orders" component={MyOrders} />
-      <Route path="/home" component={UserHome} />
+      <Route path="/admin" component={SellerDashboard} />
       <Route path="/my-returns" component={MyReturns} />
       <Route component={NotFound} />
     </Switch>
