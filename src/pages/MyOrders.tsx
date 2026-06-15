@@ -114,16 +114,18 @@ export default function MyOrders() {
     fetchOrders();
   }, []);
 
-  const claimActionCredits = (credits: number, orderId: string) => {
-    if (credits === 0) {
-      toast.info("Standard item tracking data updated.");
-      return;
-    }
-    toast.success(
-      `Eco-Action Verified! +${credits} Green Credits added for Order #${orderId}`,
-    );
-    window.dispatchEvent(new Event("storage"));
-  };
+  // const claimActionCredits = (credits: number, orderId: string) => {
+  //   if (credits === 0) {
+  //     toast.info("Standard item tracking data updated.");
+  //     return;
+  //   }
+  //   toast.success(
+  //     `Eco-Action Verified! +${credits} Green Credits added for Order #${orderId}`,
+  //   );
+  //   window.dispatchEvent(new Event("storage"));
+  // };
+
+  // console.log(claimActionCredits);
 
   const formatDate = (isoString: string) =>
     new Date(isoString).toLocaleDateString("en-IN", {

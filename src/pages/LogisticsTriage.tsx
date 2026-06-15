@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { logisticsData } from "@/data/mockData";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, ArrowRight, Layers, DollarSign, Package } from "lucide-react";
 import {
