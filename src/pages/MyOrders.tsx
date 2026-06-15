@@ -85,7 +85,7 @@ interface Order {
 
 export default function MyOrders() {
   const [, setLocation] = useLocation();
-  const [orders, setOrders]       = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function MyOrders() {
       return;
     }
     toast.success(
-      `Eco-Action Verified! +${credits} Green Credits added for Order #${orderId}`
+      `Eco-Action Verified! +${credits} Green Credits added for Order #${orderId}`,
     );
     window.dispatchEvent(new Event("storage"));
   };
@@ -143,10 +143,9 @@ export default function MyOrders() {
   return (
     <div className="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8 font-sans text-gray-900">
       <div className="max-w-4xl mx-auto">
-
         <button
           onClick={() => setLocation("/")}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-amber-600 transition-colors mb-6 cursor-pointer group border-0 bg-transparent"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-amber-600 transition-colors mb-6 cursor-pointer group"
         >
           <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
           Back to Dashboard
@@ -158,29 +157,39 @@ export default function MyOrders() {
             Your Orders
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Track sustainable shipments, manage returns, and earn circular point tokens.
+            Track sustainable shipments, manage returns, and earn circular point
+            tokens.
           </p>
         </div>
 
         {orders.length === 0 && (
           <div className="text-center py-12 bg-white border border-gray-200 rounded-md">
             <Package className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 text-sm">No orders found on this account.</p>
+            <p className="text-gray-500 text-sm">
+              No orders found on this account.
+            </p>
           </div>
         )}
 
         <div className="space-y-6">
           {orders.map((order) => {
-            const isRefurbished = order.listing?.title?.toLowerCase().includes("refurbished");
+            const isRefurbished = order.listing?.title
+              ?.toLowerCase()
+              .includes("refurbished");
 
             const frontImage =
-              order.item?.images?.find((img) => img.imageType === "FRONT")?.imageUrl ||
+              order.item?.images?.find((img) => img.imageType === "FRONT")
+                ?.imageUrl ||
               order.item?.images?.[0]?.imageUrl ||
               "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=150&q=80";
 
-            const createdDate  = new Date(order.listing?.createdAt || Date.now());
-            const returnExpiry = new Date(createdDate.getTime() + 30 * 24 * 60 * 60 * 1000);
-            const canReturn    = Date.now() < returnExpiry.getTime();
+            const createdDate = new Date(
+              order.listing?.createdAt || Date.now(),
+            );
+            const returnExpiry = new Date(
+              createdDate.getTime() + 30 * 24 * 60 * 60 * 1000,
+            );
+            const canReturn = Date.now() < returnExpiry.getTime();
 
             return (
               <div
@@ -200,21 +209,29 @@ export default function MyOrders() {
                 >
                   <div className="flex gap-x-8 gap-y-2">
                     <div>
-                      <div className="uppercase font-medium text-gray-500 tracking-wider">Order Placed</div>
+                      <div className="uppercase font-medium text-gray-500 tracking-wider">
+                        Order Placed
+                      </div>
                       <div className="font-medium text-gray-800 mt-0.5">
                         {formatDate(order.listing?.createdAt)}
                       </div>
                     </div>
                     <div>
-                      <div className="uppercase font-medium text-gray-500 tracking-wider">Total Amount</div>
+                      <div className="uppercase font-medium text-gray-500 tracking-wider">
+                        Total Amount
+                      </div>
                       <div className="font-bold text-gray-800 mt-0.5">
                         ₹{parseFloat(order.finalPrice).toLocaleString("en-IN")}
                       </div>
                     </div>
                     <div>
-                      <div className="uppercase font-medium text-gray-500 tracking-wider">Ship To</div>
+                      <div className="uppercase font-medium text-gray-500 tracking-wider">
+                        Ship To
+                      </div>
                       <div className="text-blue-600 hover:underline cursor-pointer mt-0.5">
-                        {order.buyer?.email ? order.buyer.email.split("@")[0] : "User"}
+                        {order.buyer?.email
+                          ? order.buyer.email.split("@")[0]
+                          : "User"}
                       </div>
                     </div>
                   </div>
@@ -222,12 +239,15 @@ export default function MyOrders() {
                   <div className="flex items-center gap-3">
                     {isRefurbished && (
                       <span className="flex items-center gap-1 bg-emerald-600 text-white font-bold px-2 py-0.5 rounded text-[10px] uppercase tracking-wide">
-                        <Leaf className="h-3 w-3 fill-white" /> Sustainable Choice
+                        <Leaf className="h-3 w-3 fill-white" /> Sustainable
+                        Choice
                       </span>
                     )}
                     <div className="text-right text-gray-500">
                       Order ID #{" "}
-                      <span className="font-mono text-gray-800 font-bold">{order.id}</span>
+                      <span className="font-mono text-gray-800 font-bold">
+                        {order.id}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -245,20 +265,24 @@ export default function MyOrders() {
                         {order.listing?.title || order.item?.name}
                       </h3>
                       <p className="text-xs text-gray-500">
-                        Brand: {order.item?.brand} | Category: {order.item?.category?.name}
+                        Brand: {order.item?.brand} | Category:{" "}
+                        {order.item?.category?.name}
                       </p>
                       <p className="text-xs text-gray-400 italic line-clamp-1">
                         {order.listing?.description}
                       </p>
                       <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-medium pt-1">
                         <Clock className="h-3.5 w-3.5 text-emerald-600" />
-                        <span>Status: <strong>{order.status}</strong></span>
+                        <span>
+                          Status: <strong>{order.status}</strong>
+                        </span>
                       </div>
                       {order.item?.location && (
                         <p className="text-[11px] text-gray-400 pt-1">
                           Location:{" "}
                           <span className="text-gray-600 font-medium">
-                            {order.item.location.city}, {order.item.location.state}
+                            {order.item.location.city},{" "}
+                            {order.item.location.state}
                           </span>
                         </p>
                       )}
@@ -267,7 +291,11 @@ export default function MyOrders() {
                     <div className="w-full sm:w-auto flex flex-col gap-2 shrink-0 pt-2 sm:pt-0">
                       <button
                         type="button"
-                        onClick={() => claimActionCredits(isRefurbished ? 45 : 0, order.id)}
+                        onClick={() =>
+                          setLocation(
+                            `/initiate-resell?id=${order.id}&itemId=${order.itemId}&listingId=${order.listingId}`,
+                          )
+                        }
                         className="w-full sm:w-48 bg-amber-500 hover:bg-amber-600 text-gray-950 font-medium py-1.5 px-3 rounded text-xs transition-colors border border-amber-600/20 shadow-sm cursor-pointer text-center"
                       >
                         Initiate Resell
@@ -276,7 +304,9 @@ export default function MyOrders() {
                       {canReturn ? (
                         <button
                           type="button"
-                          onClick={() => setLocation(`/initiate-return?id=${order.id}`)}
+                          onClick={() =>
+                            setLocation(`/initiate-return?id=${order.id}`)
+                          }
                           className="w-full sm:w-48 bg-white hover:bg-gray-50 text-gray-800 font-medium py-1.5 px-3 border border-gray-300 rounded text-xs transition-colors shadow-sm cursor-pointer text-center"
                         >
                           Initiate Return
