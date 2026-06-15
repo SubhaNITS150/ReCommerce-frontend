@@ -146,7 +146,7 @@ export default function MyOrders() {
 
         <button
           onClick={() => setLocation("/")}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-amber-600 transition-colors mb-6 cursor-pointer group"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-amber-600 transition-colors mb-6 cursor-pointer group border-0 bg-transparent"
         >
           <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
           Back to Dashboard
@@ -270,7 +270,7 @@ export default function MyOrders() {
                         onClick={() => claimActionCredits(isRefurbished ? 45 : 0, order.id)}
                         className="w-full sm:w-48 bg-amber-500 hover:bg-amber-600 text-gray-950 font-medium py-1.5 px-3 rounded text-xs transition-colors border border-amber-600/20 shadow-sm cursor-pointer text-center"
                       >
-                        Track Package
+                        Initiate Resell
                       </button>
 
                       {canReturn ? (
